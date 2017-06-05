@@ -28,20 +28,23 @@
 		};
 	}
 
-	var MXL = { // http://www.jens-s.dk/media/124731/contitech-synchrobelt_trapez.pdf
-		RW: ($("#N").val() >= 24 ? 0.67 : 0.61) * mmToIn,
-		FA: ($("#N").val() >= 24 ? 20 : 28) * Math.PI / 180, // flank angle, in radians
-		P: .080, // pitch
-		U: .254 * mmToIn, // distance from pitch circle to OD
-		H: 0.64 * mmToIn // tooth height
-	}
+	var MXL, XL;
+	function setSpecs() {
+		MXL = { // http://www.jens-s.dk/media/124731/contitech-synchrobelt_trapez.pdf
+			RW: ($("#N").val() >= 24 ? 0.67 : 0.61) * mmToIn,
+			FA: ($("#N").val() >= 24 ? 20 : 28) * Math.PI / 180, // flank angle, in radians
+			P: .080, // pitch
+			U: .254 * mmToIn, // distance from pitch circle to OD
+			H: 0.64 * mmToIn // tooth height
+		}
 
-	var XL = { // http://www.jens-s.dk/media/124731/contitech-synchrobelt_trapez.pdf
-		RW: 1.27 * mmToIn,
-		FA: 25 * Math.PI / 180, // flank angle, in radians
-		P: .20, // pitch
-		U: .254 * mmToIn, // distance from pitch circle to OD
-		H: 1.4 * mmToIn // tooth height
+		XL = { // http://www.jens-s.dk/media/124731/contitech-synchrobelt_trapez.pdf
+			RW: 1.27 * mmToIn,
+			FA: 25 * Math.PI / 180, // flank angle, in radians
+			P: .20, // pitch
+			U: .254 * mmToIn, // distance from pitch circle to OD
+			H: 1.4 * mmToIn // tooth height
+		}
 	}
 
 	function Arc(_r, _p1, _p4, _inA, _outA) {
@@ -72,6 +75,7 @@
 		var SP = null;
 		var N = $("#N").val(); // 20;
 
+		setSpecs(); // allows ternary operator in object definition to re-evaluate
 		switch ($("#SIZE").val()) {
 			case "MXL":
 				SP = MXL;
@@ -83,6 +87,7 @@
 				console.log("Pulley size not defined.");
 		}
 
+		console.log("FA:" + (SP.FA * 180 / Math.PI));
 		var PD = SP.P * N / Math.PI; // pitch radius
 		var OD = PD - 2 * SP.U; // outer radius
 		var RD = OD - 2 * SP.H; // root radius
