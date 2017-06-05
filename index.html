@@ -58,6 +58,7 @@
 		$("#SIZE").bind("change", draw);
 		$("#scale").bind("change", draw);
 		$("#pointsCheck").bind("change", draw);
+		$("#holeSize").bind("change", draw);
 
 		//update();
 		scale = $("#scale").val();
@@ -139,7 +140,7 @@
 		}
 		var pulleySVG = pointsToSVGPath(PointArray, 1);
 		var mySVG = '<svg xmlns="http://www.w3.org/2000/svg" height=' + svgDim + 'in width=' + svgDim + 'in viewBox="' + -OD / 2 + ' ' + -OD / 2 + ' ' + OD + ' ' + OD + '" style="stroke-width:' + strokeWidth + '"><path d="M' + (-OD * sc / 2) + ',0' + ' L' +
-			(OD * sc / 2) + ',0 ' + '" style="fill:lime;stroke:purple;" />' + pulleySVG + ts + '</svg>';
+			(OD * sc / 2) + ',0 ' + '" style="fill:lime;stroke:purple;" />' + pulleySVG + ts + '<circle cx="0" cy="0" r="' + $("#holeSize").val() + '">' + '</svg>';
 
 		if ($("#gearcontainer1").length) {
 			$("#gearcontainer1").html(mySVG);
@@ -228,7 +229,6 @@
 		for (var j = 0; j < arcArray.length - 1; j++) {
 			var d = 2 * arcArray[j].r;
 
-
 			//var temp = arcArray[j];
 			//temp.calcOut();a
 			var adif = arcArray[j].outAngle - arcArray[j].inAngle;
@@ -280,8 +280,10 @@
 			<input type="text" value="10" id="N"><br>
 			<label for="S:">Scale:</label><br>
 			<input type="text" value="1" id="scale"><br>
+			<label for="S:">Hole Size:</label><br>
+			<input type="text" value="0.05" id="holeSize"><br>
 			<br>
-			<label>OD1:</label>
+			<label>OD2:</label>
 			<label id="OD">ODOD</label><br>
 			<br>
 			<label>Show Points:</label><input type="checkbox" id="pointsCheck">
