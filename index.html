@@ -1,277 +1,296 @@
 <!-- ??? -->
 <html>
-	<link type="text/css" rel="stylesheet" href="./PulleyGenerator.css">
-	<script type="text/javascript" src="./jquery-3.2.1.js"></script>
-	<!--<script type="text/javascript" src="./jquery-1.11.1.min.js.download"></script>-->
-	<!--<script type="text/javascript" src="./jquery.cookie.js.download"></script>-->
-	<script>
-	
-		var scale = 1; //this scale determines the "zoom" of the pulley visual in pixels / inch
-		var mmToIn = 0.0393701; // a constant to convert mm to inches
-        
-		function Point(_r,_theta,_type) { // theta in radians
-			this.type = _type;
-			this.r = _r; // vector magnitude
-			this.theta = _theta; // vector angle
-			this.x = this.r * Math.cos(_theta); // calculates x component
-			this.y = this.r * Math.sin(_theta); // calculates y component
-			this.dX = null; // the x distance from the base point to the control point
-			this.dY = null; // the y distance from the base point to the control point
-            this.moveByVector = function (_mag,_dir) {this.x += _mag*Math.cos(_dir);this.y+=_mag*Math.sin(_dir);return this;};
-            this.setCoord = function (_x,_y) {this.x = _x;this.y = _y;return this;};
-		}
-        
-        var MXL = { // http://www.jens-s.dk/media/124731/contitech-synchrobelt_trapez.pdf
-            RW: ( $("#N").val() >=24 ? 0.67 : 0.61 ) * mmToIn,
-            FA: ( $("#N").val() >=24 ? 20 : 28 ) * Math.PI/180, // flank angle, in radians
-			P: .080, // pitch
-			U: .254 * mmToIn, // distance from pitch circle to OD
-			H: 0.64 * mmToIn // tooth height
-        }
-        
-        var XL = { // http://www.jens-s.dk/media/124731/contitech-synchrobelt_trapez.pdf
-            RW: 1.27 * mmToIn,
-            FA: 25 * Math.PI/180, // flank angle, in radians
-			P: .20, // pitch
-			U: .254 * mmToIn, // distance from pitch circle to OD
-			H: 1.4 * mmToIn // tooth height
-        }
-               
-		function Arc(_r,_p1,_p4,_inA,_outA) {
-			this.p1 = _p1; // first point in arc
-			this.p4 = _p4; //second point in arc
-			this.inAngle = _inA;
-			this.outAngle = _outA;			
-			this.r = _r;
-        }
-		
-		function reset() {
-			console.log("reset()");
-			$("#N").bind("change",draw);
-			$("#SIZE").bind("change",draw);
-			$("#scale").bind("change",draw);
-			
-            scale = $("#scale").val();
-			draw();
-		}
-		
-		function draw() {
-			var sc = $("#scale").val(); //
-			
-            var SP = null;
-            var N = $("#N").val(); // 20;
-            
-            switch($("#SIZE").val()) {
-                case "MXL":
-                    SP = MXL;
-                    break;
-                case "XL":
-                    SP = XL;
-                    break;
-                default:
-                    console.log("Pulley size not defined.");
-            }
-            
-			var PD = SP.P*N/Math.PI; // pitch radius
-			var OD = PD - 2*SP.U; // outer radius
-			var RD = OD - 2*SP.H; // root radius
-			
-			var RA = 2*Math.asin(SP.RW/RD); // root angle (related to root width)
-			var PA = 2*Math.PI/N; // pitch angle (arc angle for each pitch)
-			
-			//var FA = (PA - RA - TA) / 2; // tooth face(flank?) angle (per flank)
-			
-			// this section uses the quadratic equation to find the solution for an equation defining the first point on the tooth face. The equation 
-			// was developed using the law of cosines
-			var quadA = 1;
-			var quadB = -2 * (RD/2) * Math.cos(Math.PI + RA/2 - SP.FA);
-			var quadC = -( Math.pow(OD/2,2) - Math.pow(RD/2,2) );
-			var root1 = (-(quadB)+Math.sqrt(Math.pow(quadB,2)-4*(quadA)*(quadC)))/(2*quadA); // this solution is the length of the tooth side
-			
-			// FA then calculates the arc angle of the tooth side
-			var FA = Math.asin((root1/(OD/2))*Math.sin(Math.PI + RA/2 - SP.FA));
-			var TA = PA - RA - 2*FA; //2*Math.asin(TW/OD); // topland angle (related to topland width)
-            
-			var polyPoints = [];
-            
-			var t1 = RA/2 + FA;
-			console.log("RA/2 + FA:" + t1);
-			
-			for( var j = 0; j < N; j++) {
-				polyPoints.push(new Point(RD/2,j*PA,"ID")); // place point at begining of root width
-				polyPoints.push(new Point(RD/2,j*PA+RA,"ID")); // place point at intersection of root and tooth
-				polyPoints.push(new Point(OD/2,j*PA+RA+FA,"OD")); // place point at begining of tooth face
-				polyPoints.push(new Point(OD/2,j*PA+RA+FA+TA,"OD")); // place point at end of tooth face
-				//polyPoints.push();
-			}
-			
-			var PointArray = addRadii(polyPoints);
-			
-			//var myPoly = "M" + (PointArray[1].x * sc) + "," + (PointArray[0].y * sc) + " ";
-			var myPoly = "M" + (PointArray[0].x * sc) + "," + (PointArray[0].y * sc) + " ";
-			myPoly += "C"+(PointArray[0].dX * sc) + "," + (PointArray[0].dY * sc) + " " + (PointArray[1].dX * sc) + "," + (PointArray[1].dY * sc) +" "+ (PointArray[1].x* sc) + "," + (PointArray[1].y* sc) + " ";
-			//var myPoly = "M" + (PointArray[1].x * sc) + "," + (PointArray[1].y * sc) + " ";
-			for(var i = 2; i < PointArray.length; ) {
-				myPoly += "L" + (PointArray[i].x * sc) + "," + (PointArray[i].y * sc) + " ";
-				myPoly += "C"+(PointArray[i].dX * sc) + "," + (PointArray[i].dY * sc) + " " + (PointArray[i+1].dX * sc) + "," + (PointArray[i+1].dY * sc) +" "+ (PointArray[i+1].x* sc) + "," + (PointArray[i+1].y* sc) + " ";
-				i = i+2;
-			}
-			
-			var dim = Math.ceil( OD * sc);
-			
-			var ts = "";
-			for(var i = 0; i<PointArray.length;i++) {
-				ts += '<circle cx="' + (PointArray[i].x * sc) + '" cy="' + (PointArray[i].y * sc) + '" r="2" style="stroke:#006600; fill:#ff0000"/>';
-			}
-			for(var i = 0; i<polyPoints.length;i++) {
-				ts += '<circle cx="' + (polyPoints[i].x * sc) + '" cy="' + (polyPoints[i].y * sc) + '" r="2" style="stroke:#006600; fill:#0000FF"/>';
-			}
-            
-            var ts2 = pointsToSVGPath(PointArray,sc);
-			var mySVG = '<svg xmlns="http://www.w3.org/2000/svg" height=' + dim + 'px width=' + dim + 'px viewBox="' + -dim/2 + ' ' + -dim/2 + ' ' + dim + ' ' + dim + '"> <path d="' + myPoly + '" style="fill:lime;stroke:purple;stroke-width:1" /><path d="M'+ (-OD*sc/2) + ",0" + " L" + (OD*sc/2) + ",0 " + '" style="fill:lime;stroke:purple;stroke-width:1" />' + ts + ts2 + '</svg>';
-			
-			if($("#gearcontainer1").length) {
-				$("#gearcontainer1").html( mySVG );
-			}
-			else $("#screen").append( '<div id="gearcontainer1" width=' + dim + 'px height=' + dim + 'px class="svg">'+mySVG+'</div>' );
-			//$("#gearselector").append( '<li id="gearlistitem'+ID+'" data-id="'+ID+'" class="listitem"></li>' );
-			//$("#gearlistitem"+ID).bind( "click", selectionClick );
-			
-		}
-		
-		function pointsToSVGPath(_pointsArray, _sc) {
-			var svgPath = '<path d="';
-			svgPath += 'M' + (_pointsArray[0].x * _sc)+ ',' + (_pointsArray[0].y * _sc) + " ";
-			for(var i = 1; i < _pointsArray.length; i++) { // type is for incoming line segment, not outgoing from point.
-				if(_pointsArray[i].type == 'L') svgPath += "L" + (_pointsArray[i].x * _sc) + "," + (_pointsArray[i].y * _sc) + " ";
-				else if(_pointsArray[i].type == 'C') svgPath += "C"+(_pointsArray[i-1].dX * _sc) + "," + (_pointsArray[i-1].dY * _sc) + " " + (_pointsArray[i].dX * _sc) + "," + (_pointsArray[i].dY * _sc) +" "+ (_pointsArray[i].x* _sc) + "," + (_pointsArray[i].y* _sc) + " ";
-			}
-			svgPath +=  '" style="stroke:black;stroke-width:1;fill:#ff0000;opacity:0.5"/>';//style="stroke:#006600; fill:#ff0000"
-            return(svgPath);
-		}
-		
-		function downloadInnerHtml(filename, elId, mimeType) {
-			var elHtml = document.getElementById(elId).innerHTML;
-			var link = document.createElement('a');
-			mimeType = mimeType || 'text/plain';
+<link type="text/css" rel="stylesheet" href="./PulleyGenerator.css">
+<script type="text/javascript" src="./jquery-3.2.1.js"></script>
+<!--<script type="text/javascript" src="./jquery-1.11.1.min.js.download"></script>-->
+<!--<script type="text/javascript" src="./jquery.cookie.js.download"></script>-->
+<script>
+	var scale = 1; //this scale determines the "zoom" of the pulley visual in pixels / inch
+	var mmToIn = 0.0393701; // a constant to convert mm to inches
 
-			link.setAttribute('download', filename);
-			link.setAttribute('href', 'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(elHtml));
-			link.click(); 
+	function Point(_r, _theta, _type) { // theta in radians
+		this.type = _type;
+		this.r = _r; // vector magnitude
+		this.theta = _theta; // vector angle
+		this.x = this.r * Math.cos(_theta); // calculates x component
+		this.y = this.r * Math.sin(_theta); // calculates y component
+		this.dX = null; // the x distance from the base point to the control point
+		this.dY = null; // the y distance from the base point to the control point
+		this.moveByVector = function(_mag, _dir) {
+			this.x += _mag * Math.cos(_dir);
+			this.y += _mag * Math.sin(_dir);
+			return this;
+		};
+		this.setCoord = function(_x, _y) {
+			this.x = _x;
+			this.y = _y;
+			return this;
+		};
+	}
+
+	var MXL = { // http://www.jens-s.dk/media/124731/contitech-synchrobelt_trapez.pdf
+		RW: ($("#N").val() >= 24 ? 0.67 : 0.61) * mmToIn,
+		FA: ($("#N").val() >= 24 ? 20 : 28) * Math.PI / 180, // flank angle, in radians
+		P: .080, // pitch
+		U: .254 * mmToIn, // distance from pitch circle to OD
+		H: 0.64 * mmToIn // tooth height
+	}
+
+	var XL = { // http://www.jens-s.dk/media/124731/contitech-synchrobelt_trapez.pdf
+		RW: 1.27 * mmToIn,
+		FA: 25 * Math.PI / 180, // flank angle, in radians
+		P: .20, // pitch
+		U: .254 * mmToIn, // distance from pitch circle to OD
+		H: 1.4 * mmToIn // tooth height
+	}
+
+	function Arc(_r, _p1, _p4, _inA, _outA) {
+		this.p1 = _p1; // first point in arc
+		this.p4 = _p4; //second point in arc
+		this.inAngle = _inA;
+		this.outAngle = _outA;
+		this.r = _r;
+	}
+
+	function reset() {
+		console.log("reset()");
+		$("#N").bind("change", draw);
+		$("#SIZE").bind("change", draw);
+		$("#scale").bind("change", draw);
+		$("#pointsCheck").bind("change", draw);
+
+		//update();
+		scale = $("#scale").val();
+		draw();
+	}
+
+	function draw() {
+		//console.log($("#SIZE").val());
+		var sc = 1; // $("#scale").val(); //
+
+		var SP = null;
+		var N = $("#N").val(); // 20;
+
+		switch ($("#SIZE").val()) {
+			case "MXL":
+				SP = MXL;
+				break;
+			case "XL":
+				SP = XL;
+				break;
+			default:
+				console.log("Pulley size not defined.");
 		}
-		
-		$(document).ready(function() {
+
+		var PD = SP.P * N / Math.PI; // pitch radius
+		var OD = PD - 2 * SP.U; // outer radius
+		var RD = OD - 2 * SP.H; // root radius
+
+		$("#OD").text(Math.round(100 * OD) / 100 + " inches");
+
+		var RA = 2 * Math.asin(SP.RW / RD); // root angle (related to root width)
+		var PA = 2 * Math.PI / N; // pitch angle (arc angle for each pitch)
+
+		//var FA = (PA - RA - TA) / 2; // tooth face(flank?) angle (per flank)
+
+		// this section uses the quadratic equation to find the solution for an equation defining the first point on the tooth face. The equation
+		// was developed using the law of cosines
+		var quadA = 1;
+		var quadB = -2 * (RD / 2) * Math.cos(Math.PI + RA / 2 - SP.FA);
+		var quadC = -(Math.pow(OD / 2, 2) - Math.pow(RD / 2, 2));
+		var root1 = (-(quadB) + Math.sqrt(Math.pow(quadB, 2) - 4 * (quadA) * (quadC))) / (2 * quadA); // this solution is the length of the tooth side
+
+		// FA then calculates the arc angle of the tooth side
+		var FA = Math.asin((root1 / (OD / 2)) * Math.sin(Math.PI + RA / 2 - SP.FA));
+		var TA = PA - RA - 2 * FA; //2*Math.asin(TW/OD); // topland angle (related to topland width)
+
+		var polyPoints = [];
+
+		var t1 = RA / 2 + FA;
+		console.log("RA/2 + FA:" + t1);
+
+		for (var j = 0; j < N; j++) {
+			polyPoints.push(new Point(RD / 2, j * PA, "ID")); // place point at begining of root width
+			polyPoints.push(new Point(RD / 2, j * PA + RA, "ID")); // place point at intersection of root and tooth
+			polyPoints.push(new Point(OD / 2, j * PA + RA + FA, "OD")); // place point at begining of tooth face
+			polyPoints.push(new Point(OD / 2, j * PA + RA + FA + TA, "OD")); // place point at end of tooth face
+			//polyPoints.push();
+		}
+
+		var PointArray = addRadii(polyPoints);
+
+		var K = $("#scale").val(); //1;
+		console.log(OD);
+		var dim = OD * sc;
+		var svgDim = OD * sc * K;
+
+		var strokeWidth = 0; //OD/ (20*K);
+		var pointRadius = OD / (10 * K);
+		console.log($('#pointsCheck').prop('checked'));
+
+		var ts = "";
+		if ($('#pointsCheck').prop('checked')) {
+			for (var i = 0; i < PointArray.length; i++) {
+				ts += '<circle cx="' + (PointArray[i].x) + '" cy="' + (PointArray[i].y) + '" r="' + pointRadius + '" style="stroke:#006600; stroke-width:0;fill:#ff0000"/>';
+			}
+			for (var i = 0; i < polyPoints.length; i++) {
+				ts += '<circle cx="' + (polyPoints[i].x) + '" cy="' + (polyPoints[i].y) + '" r="' + pointRadius + '" style="stroke:#006600; stroke-width:0; fill:#0000FF"/>';
+			}
+		}
+		var pulleySVG = pointsToSVGPath(PointArray, 1);
+		var mySVG = '<svg xmlns="http://www.w3.org/2000/svg" height=' + svgDim + 'in width=' + svgDim + 'in viewBox="' + -OD / 2 + ' ' + -OD / 2 + ' ' + OD + ' ' + OD + '" style="stroke-width:' + strokeWidth + '"><path d="M' + (-OD * sc / 2) + ',0' + ' L' +
+			(OD * sc / 2) + ',0 ' + '" style="fill:lime;stroke:purple;" />' + pulleySVG + ts + '</svg>';
+
+		if ($("#gearcontainer1").length) {
+			$("#gearcontainer1").html(mySVG);
+		} else $("#screen").append('<div id="gearcontainer1" width=' + 'px height=' + 'px class="svg">' + mySVG + '</div>');
+		//$("#gearselector").append( '<li id="gearlistitem'+ID+'" data-id="'+ID+'" class="listitem"></li>' );
+		//$("#gearlistitem"+ID).bind( "click", selectionClick );
+
+	}
+
+	function pointsToSVGPath(_pointsArray, _sc) {
+		var svgPath = '<path d="';
+		svgPath += 'M' + (_pointsArray[0].x * _sc) + ',' + (_pointsArray[0].y * _sc) + " ";
+		for (var i = 1; i < _pointsArray.length; i++) { // type is for incoming line segment, not outgoing from point.
+			if (_pointsArray[i].type == 'L') svgPath += "L" + (_pointsArray[i].x * _sc) + "," + (_pointsArray[i].y * _sc) + " ";
+			else if (_pointsArray[i].type == 'C') svgPath += "C" + (_pointsArray[i - 1].dX * _sc) + "," + (_pointsArray[i - 1].dY * _sc) + " " + (_pointsArray[i].dX * _sc) + "," + (_pointsArray[i].dY * _sc) + " " + (_pointsArray[i].x * _sc) + "," + (
+				_pointsArray[i].y * _sc) + " ";
+		}
+		svgPath += '" style="stroke:black;fill:#00AA00;opacity:1.0"/>'; //style="stroke:#006600; fill:#ff0000"
+		return (svgPath);
+	}
+
+	function downloadInnerHtml(filename, elId, mimeType) {
+		var elHtml = document.getElementById(elId).innerHTML;
+		var link = document.createElement('a');
+		mimeType = mimeType || 'text/plain';
+
+		link.setAttribute('download', filename);
+		link.setAttribute('href', 'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(elHtml));
+		link.click();
+	}
+
+	$(document).ready(function() {
+
+		$('#downloadLink').click(function() {
+			console.log($("#SIZE").val());
 			var fileName = $("#SIZE").val() + "-N" + $("#N").val() + '.svg'; // You can use the .txt extension if you want
-            $('#downloadLink').click(function(){
-				console.log("clicked");
-				downloadInnerHtml(fileName, 'gearcontainer1','text/html');
-			});	
+			console.log("clicked");
+			$("#scale").val(1); // reset scale to unity before download
+			reset(); // redraw at unity scale before download
+			downloadInnerHtml(fileName, 'gearcontainer1', 'text/html');
 		});
-		
-		function addRadii( _pointArray) {
-			//var d = 0.0236220472;
-			var polyPoints = _pointArray
-			
-			polyPoints.unshift(polyPoints[polyPoints.length-1]); // places the nth element before the first element
-			polyPoints.push(polyPoints[1],polyPoints[2]); // adds the first anchor point to the end
-			
-			var arcArray = [];
-			
-			
-			
-			for(var i = 1; i < polyPoints.length-1;i++) { // starts at [1] because [0] is the last point
-				var r =0;
-                if(polyPoints[i].type == "ID") r = 0.3 * mmToIn;
-                else if(polyPoints[i].type == "OD") r = 0.23 * mmToIn;
-                
-                var dXout = polyPoints[i+1].x-polyPoints[i].x;
-				var dYout = polyPoints[i+1].y-polyPoints[i].y;
-				var angleOut = Math.atan(dYout / dXout);
-				
-				if( dXout < 0) angleOut += Math.PI;
-				if(angleOut < 0) angleOut += 2*Math.PI;
-				var angleOutDeg = angleOut * 180 / Math.PI;
-				
-				var dXin = polyPoints[i-1].x-polyPoints[i].x;
-				var dYin = polyPoints[i-1].y-polyPoints[i].y;
-				var angleIn = Math.atan(dYin / dXin);
-				
-				if( dXin < 0) angleIn += Math.PI;
-				if(angleIn < 0) angleIn += 2*Math.PI;
-				var angleInDeg = angleIn * 180 / Math.PI;
-				
-				var deltaA = angleOut - angleIn;
+	});
 
-				var mag = Math.abs((r) / Math.tan(deltaA/2));
-				
-				var arc = new Arc(r,new Point().setCoord(polyPoints[i].x,polyPoints[i].y).moveByVector(mag,angleIn),new Point().setCoord(polyPoints[i].x,polyPoints[i].y).moveByVector(mag,angleOut),angleIn,angleOut);
-				
-				arcArray.push(arc);
-				
-			}
-			//arcArray.push(arcArray[0]);
-			var newPointArray = [];
+	function addRadii(_pointArray) {
+		//var d = 0.0236220472;
+		var polyPoints = _pointArray
 
-			for(var j = 0; j< arcArray.length-1; j++) {
-				var d = 2 * arcArray[j].r;
-                
-                
-                //var temp = arcArray[j];
-				//temp.calcOut();a
-				var adif = arcArray[j].outAngle - arcArray[j].inAngle;
-				if(adif < 0) adif += 2*Math.PI;
-				//$.writeln(arcArray[j].p1.getCoord());            
-				//$.writeln("adif: " + adif*180/Math.PI);
+		polyPoints.unshift(polyPoints[polyPoints.length - 1]); // places the nth element before the first element
+		polyPoints.push(polyPoints[1], polyPoints[2]); // adds the first anchor point to the end
 
-				var theta = Math.PI - adif;
-				//$.writeln("theta: " + theta*180/Math.PI);
-				var e = -Math.abs((d/2)*(2*Math.sin(theta/2))/(1+2*Math.cos(theta/2))); // See section on "Circular Arcs" cagd.cs.byu.edu/~557/text/ch2.pdf
-				
-				//$.writeln("e: " + e);
-				
-				var point = new Point();
-                point.type = "L";
-				point.x = arcArray[j].p1.x;
-				point.y = arcArray[j].p1.y;
-				point.dX = arcArray[j].p1.x + e*Math.cos(arcArray[j].inAngle);
-				point.dY = arcArray[j].p1.y + e*Math.sin(arcArray[j].inAngle);
-				newPointArray.push(point);
-				
-				var point2 = new Point();
-                point2.type = "C";
-				point2.x = arcArray[j].p4.x;
-				point2.y = arcArray[j].p4.y;
-				point2.dX = arcArray[j].p4.x + e*Math.cos(arcArray[j].outAngle);
-				point2.dY = arcArray[j].p4.y + e*Math.sin(arcArray[j].outAngle);
-				newPointArray.push(point2);
-				}
-				return newPointArray;
+		var arcArray = [];
+
+		for (var i = 1; i < polyPoints.length - 1; i++) { // starts at [1] because [0] is the last point
+			var r = 0;
+			if (polyPoints[i].type == "ID") r = 0.3 * mmToIn;
+			else if (polyPoints[i].type == "OD") r = 0.23 * mmToIn;
+
+			var dXout = polyPoints[i + 1].x - polyPoints[i].x;
+			var dYout = polyPoints[i + 1].y - polyPoints[i].y;
+			var angleOut = Math.atan(dYout / dXout);
+
+			if (dXout < 0) angleOut += Math.PI;
+			if (angleOut < 0) angleOut += 2 * Math.PI;
+			var angleOutDeg = angleOut * 180 / Math.PI;
+
+			var dXin = polyPoints[i - 1].x - polyPoints[i].x;
+			var dYin = polyPoints[i - 1].y - polyPoints[i].y;
+			var angleIn = Math.atan(dYin / dXin);
+
+			if (dXin < 0) angleIn += Math.PI;
+			if (angleIn < 0) angleIn += 2 * Math.PI;
+			var angleInDeg = angleIn * 180 / Math.PI;
+
+			var deltaA = angleOut - angleIn;
+
+			var mag = Math.abs((r) / Math.tan(deltaA / 2));
+
+			var arc = new Arc(r, new Point().setCoord(polyPoints[i].x, polyPoints[i].y).moveByVector(mag, angleIn), new Point().setCoord(polyPoints[i].x, polyPoints[i].y).moveByVector(mag, angleOut), angleIn, angleOut);
+
+			arcArray.push(arc);
+
 		}
-	</script>
-	<body class="col1" data-gr-c-s-loaded="true">
-				
-		<div id="screencontainer">
-			<div id="screen" class="noguides" style="background-image: none; width: 1038.5px; height: 848.308px;"></div>
-		</div>
-		<div id="panel">
-			<h1 id="title">Pulley Generator</h1>
-			<a href="#" id="downloadLink">Download the inner html of #main</a>
-			<p>
-				<label for="SIZE:">Pulley Size:</label>
-                <select id="SIZE">>
+		//arcArray.push(arcArray[0]);
+		var newPointArray = [];
+
+		for (var j = 0; j < arcArray.length - 1; j++) {
+			var d = 2 * arcArray[j].r;
+
+
+			//var temp = arcArray[j];
+			//temp.calcOut();a
+			var adif = arcArray[j].outAngle - arcArray[j].inAngle;
+			if (adif < 0) adif += 2 * Math.PI;
+			//$.writeln(arcArray[j].p1.getCoord());
+			//$.writeln("adif: " + adif*180/Math.PI);
+
+			var theta = Math.PI - adif;
+			//$.writeln("theta: " + theta*180/Math.PI);
+			var e = -Math.abs((d / 2) * (2 * Math.sin(theta / 2)) / (1 + 2 * Math.cos(theta / 2))); // See section on "Circular Arcs" cagd.cs.byu.edu/~557/text/ch2.pdf
+
+			//$.writeln("e: " + e);
+
+			var point = new Point();
+			point.type = "L";
+			point.x = arcArray[j].p1.x;
+			point.y = arcArray[j].p1.y;
+			point.dX = arcArray[j].p1.x + e * Math.cos(arcArray[j].inAngle);
+			point.dY = arcArray[j].p1.y + e * Math.sin(arcArray[j].inAngle);
+			newPointArray.push(point);
+
+			var point2 = new Point();
+			point2.type = "C";
+			point2.x = arcArray[j].p4.x;
+			point2.y = arcArray[j].p4.y;
+			point2.dX = arcArray[j].p4.x + e * Math.cos(arcArray[j].outAngle);
+			point2.dY = arcArray[j].p4.y + e * Math.sin(arcArray[j].outAngle);
+			newPointArray.push(point2);
+		}
+		return newPointArray;
+	}
+</script>
+
+<body class="col1" data-gr-c-s-loaded="true">
+
+	<div id="screencontainer">
+		<div id="screen" class="noguides" style="background-image: none; width: 1038.5px; height: 848.308px;"></div>
+	</div>
+	<div id="panel">
+		<h1 id="title">Pulley Generator</h1>
+		<a href="#" id="downloadLink">Download the inner html of #main</a>
+		<p>
+			<label for="SIZE:">Pulley Size:</label>
+			<select id="SIZE">>
                     <option value="MXL">MXL</option>
                     <option value="XL">XL</option>
                 </select><br>
-                <label for="N:">Number of Teeth:</label><br>
-				<input type="text" value="10" id="N"><br>
-				<label for="S:">Scale:</label><br>
-				<input type="text" value="2000" id="scale"><br>
-				
-			</p>
-		</div>
+			<label for="N:">Number of Teeth:</label><br>
+			<input type="text" value="10" id="N"><br>
+			<label for="S:">Scale:</label><br>
+			<input type="text" value="1" id="scale"><br>
+			<br>
+			<label>OD:</label>
+			<label id="OD">ODOD</label><br>
+			<br>
+			<label>Show Points:</label><input type="checkbox" id="pointsCheck">
+		</p>
+	</div>
 	<script>
 		console.log("Starting ...");
 		reset();
-	</script>	
-	</body>
+	</script>
+</body>
+
 </html>
