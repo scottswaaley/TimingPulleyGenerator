@@ -131,7 +131,7 @@
 		var svgDim = OD * sc * K;
 
 		var strokeWidth = 0; //OD/ (20*K);
-		var pointRadius = OD / (10 * K);
+		var pointRadius = OD / (500);
 		console.log($('#pointsCheck').prop('checked'));
 
 		var ts = "";
@@ -282,13 +282,13 @@
                     <option value="XL">XL</option>
                 </select><br>
 			<label for="N:">Number of Teeth:</label><br>
-			<input type="text" value="10" id="N"><br>
+			<input type="text" value="50" id="N"><br>
 			<label for="S:">Scale:</label><br>
-			<input type="text" value="1" id="scale"><br>
+			<input type="text" value="5" id="scale"><br>
 			<label for="S:">Hole Size:</label><br>
 			<input type="text" value="0.05" id="holeSize"><br>
 			<br>
-			<label>OD2:</label>
+			<label>OD:</label>
 			<label id="OD">ODOD</label><br>
 			<br>
 			<label>Show Points:</label><input type="checkbox" id="pointsCheck">
