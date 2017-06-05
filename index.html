@@ -145,7 +145,7 @@
 		}
 		var pulleySVG = pointsToSVGPath(PointArray, 1);
 		var mySVG = '<svg xmlns="http://www.w3.org/2000/svg" height=' + svgDim + 'in width=' + svgDim + 'in viewBox="' + -OD / 2 + ' ' + -OD / 2 + ' ' + OD + ' ' + OD + '" style="stroke-width:' + strokeWidth + '"><path d="M' + (-OD * sc / 2) + ',0' + ' L' +
-			(OD * sc / 2) + ',0 ' + '" style="fill:lime;stroke:purple;" />' + pulleySVG + ts + '<circle cx="0" cy="0" r="' + ()$("#holeSize").val()/2) + '">' + '</svg>';
+			(OD * sc / 2) + ',0 ' + '" style="fill:lime;stroke:purple;" />' + pulleySVG + ts + '<circle cx="0" cy="0" r="' + ($("#holeSize").val()/2) + '">' + '</svg>';
 
 		if ($("#gearcontainer1").length) {
 			$("#gearcontainer1").html(mySVG);
@@ -163,7 +163,7 @@
 			else if (_pointsArray[i].type == 'C') svgPath += "C" + (_pointsArray[i - 1].dX * _sc) + "," + (_pointsArray[i - 1].dY * _sc) + " " + (_pointsArray[i].dX * _sc) + "," + (_pointsArray[i].dY * _sc) + " " + (_pointsArray[i].x * _sc) + "," + (
 				_pointsArray[i].y * _sc) + " ";
 		}
-		svgPath += '" style="stroke:black;fill:#00AA00;opacity:1.0"/>'; //style="stroke:#006600; fill:#ff0000"
+		svgPath += ' Z" style="stroke:black;fill:#00AA00;opacity:1.0"/>'; //style="stroke:#006600; fill:#ff0000"
 		return (svgPath);
 	}
 
