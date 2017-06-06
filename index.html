@@ -28,7 +28,7 @@
 		};
 	}
 
-	var MXL, XL;
+	var MXL, XL, L;
 	function setSpecs() {
 		MXL = { // http://www.jens-s.dk/media/124731/contitech-synchrobelt_trapez.pdf
 			RW: ($("#N").val() >= 24 ? 0.67 : 0.61) * mmToIn,
@@ -45,7 +45,17 @@
 			U: .254 * mmToIn, // distance from pitch circle to OD
 			H: 1.4 * mmToIn // tooth height
 		}
+
+		L = { // http://www.jens-s.dk/media/124731/contitech-synchrobelt_trapez.pdf
+			RW: 3.10 * mmToIn,
+			FA: 20 * Math.PI / 180, // flank angle, in radians
+			P: 0.375, // pitch
+			U: ( 0.762 / 2 ) * mmToIn, // distance from pitch circle to OD
+			H: 2.13 * mmToIn // tooth height
+		}
 	}
+
+
 
 	function Arc(_r, _p1, _p4, _inA, _outA) {
 		this.p1 = _p1; // first point in arc
@@ -83,6 +93,9 @@
 			case "XL":
 				SP = XL;
 				break;
+			case "L":
+					SP = L;
+					break;
 			default:
 				console.log("Pulley size not defined.");
 		}
@@ -280,6 +293,7 @@
 			<select id="SIZE">>
                     <option value="MXL">MXL</option>
                     <option value="XL">XL</option>
+										<option value="L">L</option>
                 </select><br>
 			<label for="N:">Number of Teeth:</label><br>
 			<input type="text" value="50" id="N"><br>
