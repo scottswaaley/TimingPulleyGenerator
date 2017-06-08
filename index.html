@@ -157,8 +157,7 @@
 			}
 		}
 		var pulleySVG = pointsToSVGPath(PointArray, 1);
-		var mySVG = '<svg xmlns="http://www.w3.org/2000/svg" height=' + svgDim + 'in width=' + svgDim + 'in viewBox="' + -OD / 2 + ' ' + -OD / 2 + ' ' + OD + ' ' + OD + '" style="stroke-width:' + strokeWidth + '"><path d="M' + (-OD * sc / 2) + ',0' + ' L' +
-			(OD * sc / 2) + ',0 ' + '" style="fill:lime;stroke:purple;" />' + pulleySVG + ts + '<circle cx="0" cy="0" r="' + ($("#holeSize").val()/2) + '">' + '</svg>';
+		var mySVG = '<svg xmlns="http://www.w3.org/2000/svg" height=' + svgDim + 'in width=' + svgDim + 'in viewBox="' + -OD / 2 + ' ' + -OD / 2 + ' ' + OD + ' ' + OD + '" style="stroke-width:' + strokeWidth + '">' + pulleySVG + ts + '<circle cx="0" cy="0" r="' + ($("#holeSize").val()/2) + '">' + '</svg>';
 
 		if ($("#gearcontainer1").length) {
 			$("#gearcontainer1").html(mySVG);
