@@ -7,7 +7,8 @@ body {
 h1 {
 	margin-top: 16px;
 	font-size: 20px;
-	//display: none;
+	display:flex;
+	justify-content: center;
 }
 
 #panel {
@@ -16,8 +17,8 @@ h1 {
 	padding: 0px 10px 0px 16px;
 	padding-bottom: 32px;
 	top: 0px;
-	bottom: 48px;
-	width: 250px;
+	height: 170px;
+	width: 100%;
 	overflow-x: hidden;
 	overflow-y: auto;
 	-webkit-box-sizing: -webkit-border-box;
@@ -25,56 +26,27 @@ h1 {
 }
 #screencontainer {
 	position: absolute;
-	top: 50px;
-	left: 300px;
-	right: 0px;
-	bottom: 0px;
+	top: 170px;
+
+	width:100%;
+	bottom: 50px;
 	overflow: auto;
 }
 #screen {
 	overflow: hidden;
-	min-width: 100%;
+	/*min-width: 100%;*/
 	min-height: 100%;
 }
 
 .svg {
-	overflow: hidden;
-	margin: 0px;
-	padding: 0px;
-	position: absolute;
+	/*overflow: hidden;*/
+	display:flex;
+	justify-content: center;
+	margin: 50 auto;
+	/*padding: 0px;
+	position: relative;*/
 }
-input, textarea {
-	padding: 2px 0 3px 4px;
-}
-textarea {
-	margin-top: 4px;
-	width: 392px;
-	height: 104px;
-}
-#animpanel {
-	margin-top: 32px;
-	margin-bottom: 16px;
-}
-#gearlist {
-	margin-top: 16px;
-	margin-bottom: 16px;
-}
-#gearlist ul {
-	padding: 0px;
-	margin: 3px 0px;
-}
-#gearlist ul li {
-	list-style: none;
-	margin: 0 -16px;
-	padding: 3px 16px;
-	max-width: 448px;
-}
-#gearlist p {
-	margin: 4px 0px;
-}
-.listitem {
-	cursor: pointer;
-}
+
 #footer {
 	position: fixed;
 	height: 48px;
@@ -84,250 +56,65 @@ textarea {
 	-webkit-box-sizing: -webkit-border-box;
 	box-sizing: border-box;
 }
-#screen.nolabels g.geartext {
-	display: none;
+
+.dlink {
+	display:flex;
+	justify-content: center;
+
 }
-#screen.noguides g.gearguides {
-	display: none;
-}
-#about {
-	margin: 16px 0;
-	padding-right: 16px;
-}
-#about h2 {
-	margin-bottom: 8px;
+.input-container {
+	display:flex;
+	align-items:center;
+	justify-content:space-around;
 }
 
+.input {
+	line-height: 22px;
+	padding: 5px;
+	margin: 5px;
+	height:22px;
+	/*border: 1px solid white;*/
+	display: inline-block;
+	vertical-align: top;
 
-/* color settings */
-body.col0 {
-	background: #fff;
-	color: #444;
 }
-.col0 a {
-	color: #444;
+.button {
+	padding:5px 5px 5px 5px;
+	font-size: 24px;
+	margin: 5px;
+	width:50px;
+	height:50px;
 }
-.col0 #panel,
-.col0 #footer {
-	border-right: #ddd solid 1px;
-}
-.col0 #screencontainer {
-	background: #f8f8f8;
-}
-.col0 button {
-	background: #fff;
-	color: #444;
-}
-.col0 button {
-	border: 1px solid #444;
-}
-.col0 button:hover {
-	background: #444;
-	color: #fff;
-}
-.col0 input, textarea {
-	border: 1px #ccc solid;
-}
-.col0 input.thecheckbox:after {
-	color: #fff;
-}
-.col0 input.thecheckbox:checked:after {
-	color: #444;
-}
-.col0 #gearlist li.selected {
-	background: #444;
-	color: #fff;
-	font-weight: bold;
-}
-.col0 .svg.selected .gear,
-.col0 .gear:hover {
-	fill: rgba( 118,202,255,0.5 );
-}
-.col0 .gear {
-	fill: rgba(238,238,238,0.8);
-}
-.col0 g.text polyline {
-	stroke: #444;
-}
-.col0 .shareicon {
-	fill: #444;
-}
-/* blueprint colors */
 
-body.col1,
-.col1 input, textarea,
-.col1 button {
+.floating-input-container{
+	position:absolute;
+}
+
+.tr {
+	right:10px;
+	top:10px;
+}
+
+.bc {
+	bottom:10px;
+	margin: 5px auto;/*top:10px;*/
+	width:100%;
+	justify-content: center;
+	display:flex;
+}
+
+.input-label {
+	line-height: 22px;
+	padding: 5px;
+	margin: 5px;
+	height:22px;
+	/*border: 1px solid white;*/
+	display: inline-block;
+	vertical-align: top;
+
+}
+
+.background {
 	background: #4767b2;
 	color: #fefefe;
-}
-.col1 #footer,
-.col1 a {
-	color: #fefefe;
-}
-.col1 #panel,
-.col1 #footer {
-	border-right: #3f8fc4 solid 1px;
-}
-.col1 button {
-	border: 1px solid #fefefe;
-}
-.col1 button:hover {
-	background: #fefefe;
-	color: #0071b8;
-}
-
-/*.col1 #screencontainer {
-	background: #043661;
-}*/
-.col1 input, textarea {
-	border: 1px rgba( 254, 254, 254, 0.5 ) solid;
-}
-.col1 input.thecheckbox:after {
-	color: #0071b8;
-}
-.col1 input.thecheckbox:checked:after {
-	color: #fefefe;
-}
-.col1 #footer g.text {
-	opacity: 0.5;
-}
-.col1 .svg.selected .gear,
-.col1 .gear:hover {
-	fill: rgba( 51,141,198, 0.8 );
-}
-.col1 .gear {
-	fill: rgba(0, 113, 184, 0.8);
-}
-.col1 .gear,
-.col1 g.text polyline,
-.col1 g.guides circle,
-.col1 g.guides polyline {
-	stroke: #fefefe;
-}
-.col1 g.guides {
-	opacity: 0.8;
-}
-.col1 g.guides circle.pitch {
-	opacity: 0.5;
-}
-.col1 g.guides circle.base {
-	opacity: 0.3;
-}
-.col1 g.guides circle.root,
-.col1 g.guides circle.outer {
-	opacity: 0.2;
-}
-.col1 circle.firstmarker {
-	fill: #fefefe;
-}
-.col1 #gearlist li {
-	color: rgba( 255,255,255, 0.5 );
-}
-.col1 #gearlist li.selected {
-	background: #fefefe;
-	color: #0071b8;
-	font-weight: bold;
-	/*rgba( 51,141,198, 0.8 );
-	color: #fff;*/
-}
-.col1 .shareicon {
-	fill: #fff;
-}
-/* dark colors */
-
-body.col2,
-.col2 input, textarea {
-	background: #222;
-	color: #ccc;
-}
-.col2 #footer,
-.col2 a {
-	color: #ccc;
-}
-.col2 #panel,
-.col2 #footer {
-	border-right: #444 solid 1px;
-}
-.col2 button {
-	background: #222;
-	color: #ccc;
-}
-.col2 button {
-	border: 1px solid #ccc;
-}
-.col2 button:hover {
-	background: #ccc;
-	color: #222;
-}
-.col2 input, textarea {
-	border: 1px #888 solid;
-}
-.col2 input.thecheckbox:after {
-	color: #222;
-}
-.col2 input.thecheckbox:checked:after {
-	color: #ccc;
-}
-.col2 #gearlist li.selected {
-	background: #ccc;
-	color: #222;
-	font-weight: bold;
-}
-.col2 #screencontainer {
-	background: #1c1c1c;
-}
-.col2 input, textarea {
-	border: 1px rgba( 254, 254, 254, 0.5 ) solid;
-}
-.col2 #footer g.text {
-	opacity: 0.5;
-}
-.col2 .svg.selected .gear,
-.col2 .gear:hover {
-	fill: rgba( 118,202,255,0.5 );
-	/*fill: rgba( 0,97,137, 0.8 );*/
-}
-.col2 .gear {
-	fill: rgba(48, 48, 48, 0.5);
-}
-.col2 .gear,
-.col2 g.text polyline,
-.col2 g.guides circle,
-.col2 g.guides polyline {
-	stroke: #fefefe;
-}
-.col2 g.guides {
-	opacity: 0.8;
-}
-.col2 g.guides circle.pitch {
-	opacity: 0.5;
-}
-.col2 g.guides circle.base {
-	opacity: 0.3;
-}
-.col2 g.guides circle.root,
-.col2 g.guides circle.outer {
-	opacity: 0.2;
-}
-.col2 circle.firstmarker {
-	fill: #ccc;
-}
-.col2 .svg.selected circle.firstmarker,
-.col2 .gear:hover circle.firstmarker {
-	fill: #fefefe;
-}
-.col2 #gearlist li {
-	color: #888;
-}
-.col2 #gearlist li.selected {
-	background: #ccc;
-	color: #222;
-}
-.col2 #panel g.text polyline {
-	stroke: #ccc;
-}
-.col2 .shareicon {
-	fill: #ccc;
-	/*stroke-width: 0.5;
-	stroke: #ccc;*/
 }
