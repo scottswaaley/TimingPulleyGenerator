@@ -96,6 +96,14 @@ h1 {
 }
 
 .bc {
+	bottom:30px;
+	margin: 5px auto;/*top:10px;*/
+	width:100%;
+	justify-content: center;
+	display:flex;
+}
+
+.bc2 {
 	bottom:10px;
 	margin: 5px auto;/*top:10px;*/
 	width:100%;
