@@ -75,6 +75,7 @@
 		$("#zoom-in").bind("click", zoomIn);
 		$("#zoom-out").bind("click", zoomOut);
 
+
 		//update();
 		//scale = $("#scale").val();
 		draw();
@@ -89,7 +90,7 @@
 
 		var SP = null;
 		var N = $("#N").val(); // 20;
-
+		$("#scale").text(scale);
 		setSpecs(); // allows ternary operator in object definition to re-evaluate
 		switch ($("#SIZE").val()) {
 			case "MXL":
@@ -297,6 +298,8 @@
 		<div class="floating-input-container bc">
 			<label>OD:&nbsp<sp></label>
 			<label id="OD">ODOD</label>
+			<label>&nbsp&nbsp|&nbsp&nbspScale:&nbsp<sp></label>
+			<label id="scale">TBD</label>
 		</div>
 	</div>
 	<div id="panel">
