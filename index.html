@@ -81,7 +81,7 @@
 	}
 
 	function zoomIn() { scale++; draw();}
-	function zoomOut() { scale--; draw();}
+	function zoomOut() { if(scale>0)scale--; draw();}
 
 	function draw() {
 		//console.log($("#SIZE").val());
@@ -302,7 +302,7 @@
 	<div id="panel">
 		<h1 id="title">Pulley Generator</h1>
 		<a href="#" class="dlink" id="downloadLink">Download your pulley!</a>
-		<div class="input-container">
+		<div class="input-container" >
 			<div class="input-label"><label for="SIZE:">Pulley Size:</label></div>
 			<div class="input"><select id="SIZE">>
                     <option value="MXL">MXL</option>
