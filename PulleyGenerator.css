@@ -5,19 +5,25 @@ body {
 	-webkit-text-size-adjust:none;
 }
 h1 {
-	margin-top: 16px;
+	margin-top: 10px;
+	margin-bottom: 10px;
 	font-size: 20px;
 	display:flex;
 	justify-content: center;
+	height:35px;
 }
 
 #panel {
+	display:flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
 	position: fixed;
 	margin: 0px;
-	padding: 0px 10px 0px 16px;
-	padding-bottom: 32px;
+	padding: 10px 10px 10px 10px;
+	/*padding-bottom: 32px;*/
 	top: 0px;
-	height: 170px;
+	height: 200px;
 	width: 100%;
 	overflow-x: hidden;
 	overflow-y: auto;
@@ -60,12 +66,44 @@ h1 {
 .dlink {
 	display:flex;
 	justify-content: center;
+	align-items: center;
+	font-size: 16;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	width:210px;
+	background:white;
+
+	text-decoration: none;
+	word-break: word;
+	padding: 2;
+	border: 2px solid black;
+	border-radius: 10px;
+	opacity:0.8;
 
 }
 .input-container {
 	display:flex;
 	align-items:center;
 	justify-content:space-around;
+
+
+}
+
+.title-container {
+	display:flex;
+	/*align-items:center;*/
+	justify-content:center;
+	/*width:200px;*/
+
+}
+
+.title {
+
+	/*border: 1px solid white;*/
+	width:100%;
+	display: flex;
+	vertical-align: top;
+
 }
 
 .input {
@@ -96,7 +134,7 @@ h1 {
 }
 
 .bc {
-	bottom:30px;
+	bottom:40px;
 	margin: 5px auto;/*top:10px;*/
 	width:100%;
 	justify-content: center;
@@ -109,6 +147,7 @@ h1 {
 	width:100%;
 	justify-content: center;
 	display:flex;
+	text-align: center;
 }
 
 .input-label {
