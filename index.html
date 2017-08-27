@@ -72,6 +72,7 @@
 		//$("#scale").bind("change", draw);
 		$("#pointsCheck").bind("change", draw);
 		$("#holeSize").bind("change", draw);
+		$("#kerfWidth").bind("change", draw);
 		$("#zoom-in").bind("click", zoomIn);
 		$("#zoom-out").bind("click", zoomOut);
 
@@ -134,7 +135,7 @@
 		var t1 = RA / 2 + FA;
 		console.log("RA/2 + FA:" + t1);
 
-		for (var j = 0; j < N; j++) {
+		for (var j = 0; j < N ; j++) {
 			polyPoints.push(new Point(RD / 2, j * PA, "ID")); // place point at begining of root width
 			polyPoints.push(new Point(RD / 2, j * PA + RA, "ID")); // place point at intersection of root and tooth
 			polyPoints.push(new Point(OD / 2, j * PA + RA + FA, "OD")); // place point at begining of tooth face
@@ -143,8 +144,9 @@
 		}
 
 		var PointArray = addRadii(polyPoints);
+		//PointArray = createKerfGeometry(PointArray);
 
-		var K = scale; //1;
+		var K = scale;
 		console.log(OD);
 		var dim = OD * sc;
 		var svgDim = OD * sc * K;
@@ -170,8 +172,48 @@
 		} else $("#screen").append('<div id="gearcontainer1" width=' + 'px height=' + 'px class="svg">' + mySVG + '</div>');
 		//$("#gearselector").append( '<li id="gearlistitem'+ID+'" data-id="'+ID+'" class="listitem"></li>' );
 		//$("#gearlistitem"+ID).bind( "click", selectionClick );
-
+		//
 	}
+	function createKerfGeometry(_pointsArray) { // processes point array to include kerf allowance
+		// process first M point
+
+		for (var i = 1; i < 20; i++) { // type is for incoming line segment, not outgoing from point.
+			if (_pointsArray[i].type == 'L') {
+				var dXin = _pointsArray[i].x - _pointsArray[i - 1].x;
+				var dYin = _pointsArray[i].y - _pointsArray[i - 1].y;
+				var angleIn = Math.atan(dYin / dXin);
+				//if(angleIn > 0) angleIn *= -1;
+				//if(angleIn)  = a
+
+				console.log(dXin + "," + dYin + "," + angleIn*180/Math.PI);
+
+				_pointsArray[i-1].moveByVector($("#kerfWidth").val(),angleIn+Math.PI/2);
+				_pointsArray[i].moveByVector($("#kerfWidth").val(),angleIn+Math.PI/2);
+
+			}
+			else if (_pointsArray[i].type == 'C') {
+			}
+		}
+		return _pointsArray;
+		// var dXout = _pointsArray[i + 1].x - _pointsArray[i].x;
+		// var dYout = _pointsArray[i + 1].y - _pointsArray[i].y;
+		// var angleOut = Math.atan(dYout / dXout);
+		//
+		// if (dXout < 0) angleOut += Math.PI;
+		// if (angleOut < 0) angleOut += 2 * Math.PI;
+		// var angleOutDeg = angleOut * 180 / Math.PI;
+		//
+		// var dXin = _pointsArray[i - 1].x - _pointsArray[i].x;
+		// var dYin = _pointsArray[i - 1].y - _pointsArray[i].y;
+		// var angleIn = Math.atan(dYin / dXin);
+		//
+		// if (dXin < 0) angleIn += Math.PI;
+		// if (angleIn < 0) angleIn += 2 * Math.PI;
+		// var angleInDeg = angleIn * 180 / Math.PI;
+		//
+		// var deltaA = angleOut - angleIn;
+	}
+
 
 	function pointsToSVGPath(_pointsArray, _sc) {
 		var svgPath = '<path d="';
@@ -331,9 +373,13 @@
 				<div class="input-label"><label for="S:">Hole Size:</label></div>
 				<div class="input"><input type="text" value="0.05" id="holeSize"style="width:40px"></div>
 			</div>
+			<!--<div class="input-container">
+				<div class="input-label"><label for="S:">Kerf Width:</label></div>
+				<div class="input"><input type="text" value="0.01" id="kerfWidth"style="width:40px"></div>
+			</div>-->
 			<div class="input-container">
 				<div class="input-label"><label>Show Points:</label></div>
-				<div class="input-label"><input type="checkbox" id="pointsCheck"></div>
+				<div class="input-label"><input type="checkbox" id="pointsCheck" ></div>
 			</div>
 		</div>
 
